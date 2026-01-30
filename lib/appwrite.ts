@@ -6,7 +6,12 @@ export const appwriteConfig = {
   platform: "in.denim.fooddelivery",
   projectId: process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID!,
   databaseId: '697b5f1e00347ddce219',
-  userTableid: 'user'
+  bucketId: '697c515b00286a6febaf',
+  userTableId: 'user',
+  categoriesTableId: 'categories',
+  menuTableId: 'menu',
+  customizationsTableId: 'customizations',
+  menuCustomizationsTableId: 'menu_customizations'
 }
 
 export const client = new Client();
@@ -25,7 +30,7 @@ export const createUser = async ({ email, password, name }: CreateUserParams) =>
     await signIn({ email, password })
 
     const avatarUrl = avatars.getInitialsURL(name)
-    return tablesDb.createRow({ databaseId: appwriteConfig.databaseId, tableId: appwriteConfig.userTableid, rowId: ID.unique(), data: { name, email, accountId: newAccount.$id, avatar: avatarUrl } })
+    return tablesDb.createRow({ databaseId: appwriteConfig.databaseId, tableId: appwriteConfig.userTableId, rowId: ID.unique(), data: { name, email, accountId: newAccount.$id, avatar: avatarUrl } })
   } catch (e) {
     throw new Error(e as string)
   }
@@ -46,7 +51,7 @@ export const getCurrentUser = async () => {
 
     const currentUser = await tablesDb.listRows({
       databaseId: appwriteConfig.databaseId,
-      tableId: appwriteConfig.userTableid,
+      tableId: appwriteConfig.userTableId,
       queries: [Query.equal('accountId', currentAccount.$id)]
     })
 
