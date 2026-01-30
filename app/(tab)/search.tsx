@@ -7,6 +7,8 @@ import { useEffect } from 'react'
 import { View, Text, Button, FlatList } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import cn from 'clsx';
+import MenuCard from '@/components/MenuCard'
+import { MenuItem } from '@/type'
 
 const Search = () => {
   const {category, query} = useLocalSearchParams<{category: string; query: string}>()
@@ -35,7 +37,7 @@ const Search = () => {
 
         return (
           <View className={cn('flex-1 max-w-[48%]', !isFirstRightColItem ? 'mt-10': 'mt-0')}>
-            <Text>Menu Card</Text>
+            <MenuCard item={item as unknown as MenuItem} />
           </View>
         )}}
         keyExtractor={item => item.$id}
