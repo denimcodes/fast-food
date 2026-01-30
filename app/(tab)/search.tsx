@@ -1,12 +1,73 @@
+import CartButton from '@/components/CartButton'
+import { getCategories, getMenu } from '@/lib/appwrite'
 import seed from '@/lib/seed'
-import { View, Text, Button } from 'react-native'
+import useAppwrite from '@/lib/useAppwrite'
+import { useLocalSearchParams } from 'expo-router'
+import { useEffect } from 'react'
+import { View, Text, Button, FlatList } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import cn from 'clsx';
 
 const Search = () => {
+  const {category, query} = useLocalSearchParams<{category: string; query: string}>()
+  const {data: menus, refetch, loading} = useAppwrite({
+    fn: getMenu,
+    params: {
+      category,
+      query,
+      limit: 6
+    }
+  })
+  const {data: categories} = useAppwrite({
+    fn: getCategories
+  })
+
+  useEffect(() => {
+    refetch({category, query, limit: 6})
+  }, [category, query])
+
   return (
-    <SafeAreaView>
-      <Text>Search</Text>
-      <Button title='Seed' onPress={() => {seed().catch((e) => console.log(e))}}/>
+    <SafeAreaView className='bg-white h-full'>
+      <FlatList 
+        data={menus} 
+        renderItem={({item, index}) => {
+          const isFirstRightColItem = index % 2 === 0;
+
+        return (
+          <View className={cn('flex-1 max-w-[48%]', !isFirstRightColItem ? 'mt-10': 'mt-0')}>
+            <Text>Menu Card</Text>
+          </View>
+        )}}
+        keyExtractor={item => item.$id}
+        numColumns={2}
+        columnWrapperStyle={({
+          gap: 7
+        })}
+        contentContainerStyle={({
+          gap: 8,
+          paddingHorizontal: 16,
+          paddingBottom: 48
+        })}
+        ListHeaderComponent={() => (
+          <View className='my-5 gap-5'>
+            <View className='flex-between flex-row w-full'>
+              <View className='flex-start'>
+                <Text className='small-bold uppercase text-primary'>Search</Text>
+                <View className='flex-start flex-row gap-x-1 mt-0.5'>
+                  <Text className='paragraph-semibold text-dark-100'>Find your favorite food</Text>
+                </View>
+              </View>
+
+                <CartButton />
+            </View>
+
+            <Text>Search Input</Text>
+
+            <Text>Filter</Text>
+          </View>
+        )}
+        ListEmptyComponent={() => !loading && <Text>No results</Text>}
+        />
     </SafeAreaView>
   )
 }
